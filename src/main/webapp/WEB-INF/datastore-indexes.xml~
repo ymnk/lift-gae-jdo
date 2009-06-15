@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<datastore-indexes 
+  autoGenerate="true">
+    <!-- Used 1 time in query history -->
+<!--
+    <datastore-index kind="Author" ancestor="false" source="auto">
+        <property name="id" direction="desc"/>
+        <property name="name" direction="desc"/>
+    </datastore-index>
+-->
+    <datastore-index kind="Book" ancestor="true" source="auto">
+        <property name="books_INTEGER_IDX" direction="asc"/>
+<!--
+        <property name="id" direction="desc"/>
+        <property name="title" direction="desc"/>
+        <property name="published" direction="desc"/>
+        <property name="genre" direction="desc"/>
+        <property name="author" direction="desc"/>
+-->
+    </datastore-index>
+</datastore-indexes> 

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm
+        http://java.sun.com/xml/ns/persistence/orm_1_0.xsd" version="1.0">
+
+  <package>com.jcraft.lift.model</package>
+
+  <entity class="Book">
+    <named-query name="findBooksByAuthor">
+      <query><![CDATA[select from com.jcraft.lift.model.Book where author.id = :id order by title asc]]></query>
+    </named-query>
+    <named-query name="findBooksByDate">
+      <query><![CDATA[select b from com.jcraft.lift.model.Book b where b.published between :startDate and :endDate]]></query>
+    </named-query>
+    <named-query name="findBooksByTitle">
+      <!--<query><![CDATA[select b from com.jcraft.lift.model.Book b where lower(b.title) like :title order by b.title]]></query>-->
+      <query><![CDATA[select from com.jcraft.lift.model.Book where title = :title order by title]]></query>
+    </named-query>
+    <named-query name="findAllBooks">
+      <query><![CDATA[select from com.jcraft.lift.model.Book order by title asc]]></query>
+    </named-query>
+  </entity>
+  <entity class="Author">
+    <named-query name="findAllAuthors">
+      <query><![CDATA[select from com.jcraft.lift.model.Author order by name asc]]></query>
+    </named-query>
+  </entity>
+</entity-mappings>
