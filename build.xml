@@ -1,5 +1,5 @@
 <project name="myapp" default="datanucleusenhance">
-    <property name="sdk.dir" location="/tmp/appengine-java-sdk-1.2.1"/>
+    <property name="sdk.dir" location="????"/>
     <import file="${sdk.dir}/config/user/ant-macros.xml"/>
     <property name="war.dir" value="war"/>
 
