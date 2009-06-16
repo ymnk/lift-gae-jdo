@@ -45,6 +45,14 @@ Notes
   * The package org.scala_libs.jdo is the scala wrapper for JDO2 APIs.
 
 
+TODO
+====
+  * By using the maven-datanucleus-plugin plugin, we will be able to
+    skip steps to download datanucleus-enhancer.jar file.
+  * org.scala_libs.jdo package should be independently released and
+    provided as scalajdo.
+ 
+
 Enjoy!
 
 
