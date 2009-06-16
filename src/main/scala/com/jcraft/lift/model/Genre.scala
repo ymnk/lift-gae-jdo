@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 WorldWide Conferencing, LLC
+ * Copyright 2009 ymnk, JCraft,Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,17 @@
  */
 package com.jcraft.lift.model
 
-object Genre extends Enumeration with Enumv {
+import scala.collection.mutable.Map
+
+object Genre extends Enumeration{
+
+  private var nameDescriptionMap = Map[String, String]()
+
+  private def Value(name: String, desc: String) : Value = {
+    nameDescriptionMap += (name -> desc)
+    new Val(name)
+  }
+
   val Mystery = Value("Mystery", "Mystery")
   val SciFi = Value("SciFi", "SciFi")
   val Classic = Value("Classic", "Classic")
@@ -23,6 +33,12 @@ object Genre extends Enumeration with Enumv {
   val Horror = Value("Horror", "Horror")
   val Poetry = Value("Poetry", "Poetry")
   val unknown = Value("Unknown", "Unknown genre")
-}
 
-class GenreType extends EnumvType(Genre) {}
+  def getDescriptionOrName(ev: this.Value) = {
+    try { nameDescriptionMap(""+ev) } 
+    catch {  case e: NoSuchElementException => ev.toString }
+  }
+
+  def getNameDescriptionList =  
+    elements.toList.map(v => (v.toString, getDescriptionOrName(v))).toList
+}

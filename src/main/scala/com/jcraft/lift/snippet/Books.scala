@@ -24,13 +24,10 @@ import Helpers._
 
 import _root_.com.jcraft.lift.model._
 import _root_.com.jcraft.lift.model.Model._
-
-import _root_.javax.persistence.{EntityExistsException,PersistenceException}
-
 import _root_.scala.collection.jcl.Conversions.convertList
-
 import _root_.com.google.appengine.api.datastore.Key
 import _root_.com.google.appengine.api.datastore.KeyFactory._
+import _root_.javax.jdo.JDOUserException
 
 import org.scala_libs.jdo._
 
@@ -118,9 +115,7 @@ class BookOps {
           }
 	  redirectTo("list")
 	} catch {
-	  case ee : EntityExistsException => 
-            error("That book already exists.")
-	  case pe : PersistenceException => 
+	  case pe : JDOUserException => 
             error("Error adding book"); Log.error("Book add failed", pe)
 	}
       }
