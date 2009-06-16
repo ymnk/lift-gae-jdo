@@ -49,11 +49,11 @@ class BookOps {
 
     books.flatMap(book =>
       bind("book", xhtml,
-	   "title" -> Text(book.title),
-	   "published" -> Text(formatter.format(book.published)),
-	   "genre" -> Text(if(book.genre != null) book.genre.toString else ""),
-	   "author" -> Text(book.author.name),
-	   "edit" -> SHtml.link("add.html", 
+           "title" -> Text(book.title),
+           "published" -> Text(formatter.format(book.published)),
+           "genre" -> Text(if(book.genre != null) book.genre.toString else ""),
+           "author" -> Text(book.author.name),
+           "edit" -> SHtml.link("add.html", 
                                 () => bookVar(Some(book.id)), 
                                 Text(?("Edit")))))
   }
@@ -63,9 +63,9 @@ class BookOps {
     case Some(key) => {
       Model{ case pm =>
         val foo=pm.getObjectById(classOf[Book], key).asInstanceOf[Book]
-          pm.detachCopy(foo.author)
-          val books = foo.author.books
-          books.get(books.indexOf(foo))
+        pm.detachCopy(foo.author)
+        val books = foo.author.books
+        books.get(books.indexOf(foo))
       }
     }
     case _ => new Book()
@@ -75,15 +75,15 @@ class BookOps {
     List((if (toCheck.title.length == 0) { 
             S.error("You must provide a title"); false 
            } else true),
-	 (if (toCheck.published == null) { 
+         (if (toCheck.published == null) { 
             S.error("You must provide a publish date"); false 
           } else true),
-	 (if (toCheck.genre == null) { 
+         (if (toCheck.genre == null) { 
             S.error("You must select a genre"); false } else true),
-	 (if (toCheck.author == null) {
-	    S.error("You must select an author"); false
-	  } else true)
-         ).forall(_ == true)
+         (if (toCheck.author == null) {
+            S.error("You must select an author"); false
+          } else true)
+        ).forall(_ == true)
   }
 
   def setDate (input : String, toSet : Book) {
@@ -105,7 +105,7 @@ class BookOps {
 
     def doAdd () = 
       if (is_valid_Book_?(book)) {
-	try{
+        try{
           Model{ case pm =>
             book.id match {
               case null => book.author.books.add(book)
@@ -113,11 +113,12 @@ class BookOps {
             }
             pm.makePersistent(book.author)
           }
-	  redirectTo("list")
-	} catch {
+          redirectTo("list")
+        } 
+        catch {
 	  case pe : JDOUserException => 
             error("Error adding book"); Log.error("Book add failed", pe)
-	}
+        }
       }
 
     lazy val current = book
@@ -143,18 +144,18 @@ class BookOps {
 
     import SHtml.{hidden, text, select, submit}
     bind("book", xhtml,
-	 "id" -> hidden(() => bookVar(Some(current.id))),
-	 "title" -> text(book.title, book.title=_),
-	 "published" -> text(formatter.format(book.published), 
+         "id" -> hidden(() => bookVar(Some(current.id))),
+         "title" -> text(book.title, book.title=_),
+         "published" -> text(formatter.format(book.published), 
                                    setDate(_, book)) % ("id" -> "published"),
-	 "genre" -> select(Genre.getNameDescriptionList, 
-                          (Box.legacyNullTest(book.genre).map(_.toString) or Full("")), 
-                          choice => book.genre = Genre.valueOf(choice).getOrElse("").toString),
-	 "author" -> select(choices, 
+         "genre" -> select(Genre.getNameDescriptionList, 
+                           (Box.legacyNullTest(book.genre).map(_.toString) or Full("")), 
+                           choice => book.genre = Genre.valueOf(choice).getOrElse("").toString),
+         "author" -> select(choices, 
                             default, 
                             (id) => if(book.author==null)
                                       book.author=findAuthorById(id)),
-	 "save" -> submit(?("Save"), doAdd))
+         "save" -> submit(?("Save"), doAdd))
   }
 
   def searchResults (xhtml : NodeSeq) : NodeSeq = 
@@ -170,7 +171,7 @@ class BookOps {
       val l = Model{ case pm =>
         val query = pm.newQuery(classOf[Book])
         try{
-	  query.setFilter("title == searchedTitle")
+          query.setFilter("title == searchedTitle")
           query.declareParameters("java.lang.String searchedTitle")
           query.execute(title).asInstanceOf[java.util.List[Book]]
         }
@@ -182,8 +183,7 @@ class BookOps {
     }
 
     bind("search", xhtml,
-	 "title" -> SHtml.text(title, title = _),
-	 "run" -> SHtml.submit(?("Search"), doSearch _))
+         "title" -> SHtml.text(title, title = _),
+         "run" -> SHtml.submit(?("Search"), doSearch _))
   }
-
 }

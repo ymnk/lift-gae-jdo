@@ -49,16 +49,16 @@ class AuthorOps {
         }
         finally{query.closeAll}
       }
-      convertList[Book](l).toList//.filter(_.author.id == a.id)
+      convertList[Book](l).toList
     }
 
     authors.flatMap(author =>
       bind("author", xhtml,
-	   "name" -> Text(author.name),
-	   "count" -> SHtml.link("/books/search", 
-                                 () => BookOps.resultVar(findBooksByAuthor(author))
-	     , Text(author.books.size.toString)),
-	   "edit" -> SHtml.link("add.html", 
+           "name" -> Text(author.name),
+           "count" -> SHtml.link("/books/search", 
+                                 () => BookOps.resultVar(findBooksByAuthor(author)),
+                                 Text(author.books.size.toString)),
+           "edit" -> SHtml.link("add.html", 
                                 () => authorVar(author),
                                 Text(?("Edit")))))
   }
@@ -69,8 +69,9 @@ class AuthorOps {
   def add (xhtml : NodeSeq) : NodeSeq = {
     def doAdd () = {
       if (author.name.length == 0) {
-	error("emptyAuthor", "The author's name cannot be blank")
-      } else {
+        error("emptyAuthor", "The author's name cannot be blank")
+      } 
+      else {
         Model{ case pm =>
           pm.makePersistent(author)
         }
