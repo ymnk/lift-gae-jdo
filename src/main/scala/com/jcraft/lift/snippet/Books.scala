@@ -24,12 +24,12 @@ import Helpers._
 
 import _root_.com.jcraft.lift.model._
 import _root_.com.jcraft.lift.model.Model._
-import _root_.scala.collection.jcl.Conversions.convertList
 import _root_.com.google.appengine.api.datastore.Key
 import _root_.com.google.appengine.api.datastore.KeyFactory._
 import _root_.javax.jdo.JDOUserException
 
-import org.scala_libs.jdo._
+import _root_.org.scala_libs.jdo._
+import _root_.org.scala_libs.jdo.criterion._
 
 object BookOps {
   object resultVar extends RequestVar[List[Book]](Nil)
@@ -39,13 +39,7 @@ class BookOps {
   val formatter = new java.text.SimpleDateFormat("yyyyMMdd")
 
   def list (xhtml : NodeSeq) : NodeSeq = {
-    val books = {
-      Model{ case pm =>
-        val query = pm.newQuery(classOf[Book])
-        try{ new ScalaQuery[Book](query).getResultList }
-        finally{query.closeAll}
-      }
-    }
+    val books = Model.finallyClosePM{ from(_, classOf[Book]).resultList }
 
     books.flatMap(book =>
       bind("book", xhtml,
@@ -61,7 +55,7 @@ class BookOps {
   object bookVar extends RequestVar[Option[Key]](None)
   lazy val book = bookVar.is match {
     case Some(key) => {
-      Model{ case pm =>
+      Model.finallyClosePM{ pm =>
         val foo=pm.getObjectById(classOf[Book], key).asInstanceOf[Book]
         pm.detachCopy(foo.author)
         val books = foo.author.books
@@ -94,7 +88,7 @@ class BookOps {
   def findAuthor(a:Author):Author = findAuthorById(a.id)
   def findAuthorById(id:String):Author = findAuthorById(stringToKey(id))
   def findAuthorById(id:Key):Author = {
-    Model{ case pm =>
+    Model.finallyClosePM{ pm =>
       val a=pm.getObjectById(classOf[Author], id).asInstanceOf[Author]
       pm.detachCopyAll(a.books)
       a
@@ -106,7 +100,7 @@ class BookOps {
     def doAdd () = 
       if (is_valid_Book_?(book)) {
         try{
-          Model{ case pm =>
+          Model.finallyClosePM{ pm =>
             book.id match {
               case null => book.author.books.add(book)
               case _ => 
@@ -123,12 +117,8 @@ class BookOps {
 
     lazy val current = book
 
-    val authors = {
-      Model{ case pm =>
-        val query = pm.newQuery(classOf[Author])
-        try{ new ScalaQuery[Author](query).getResultList }
-        finally{query.closeAll}
-      }
+    val authors = Model.finallyClosePM{ 
+      from(_, classOf[Author]).resultList 
     }
 
     val choices = authors.map(author => 
@@ -168,18 +158,12 @@ class BookOps {
     var title = ""
 
     def doSearch () = {
-      val l = Model{ case pm =>
-        val query = pm.newQuery(classOf[Book])
-        try{
-          query.setFilter("title == searchedTitle")
-          query.declareParameters("java.lang.String searchedTitle")
-          query.execute(title).asInstanceOf[java.util.List[Book]]
-        }
-        finally{
-          query.closeAll
-        }
+      val l = Model.finallyClosePM{
+        from(_, classOf[Book])
+            .where(eqC("title", title))
+            .resultList
       }
-      BookOps.resultVar(convertList[Book](l).toList)
+      BookOps.resultVar(l)
     }
 
     bind("search", xhtml,

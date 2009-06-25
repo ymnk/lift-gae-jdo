@@ -22,34 +22,24 @@ import net.liftweb.util.{Helpers,Log}
 import S._
 import Helpers._
 
-import com.jcraft.lift.model._
-import com.jcraft.lift.model.Model._
-import org.scala_libs.jdo._
-
-import _root_.scala.collection.jcl.Conversions.convertList
+import _root_.com.jcraft.lift.model._
+import _root_.com.jcraft.lift.model.Model._
+import _root_.org.scala_libs.jdo._
+import _root_.org.scala_libs.jdo.criterion._
 
 class AuthorOps {
 
   def list (xhtml : NodeSeq) : NodeSeq = {
-    val authors = {
-      Model{ case pm =>
-        val query = pm.newQuery(classOf[Author])
-        try{ new ScalaQuery[Author](query).getResultList }
-        finally{query.closeAll}
-      }
+    val authors = Model.finallyClosePM{ pm => 
+      from(pm, classOf[Author]).resultList 
     }
 
     def findBooksByAuthor(a:Author) = {
-      val l = Model{ case pm =>
-        val query = pm.newQuery(classOf[Book])
-        try{
-          query.setFilter("author == paramAuthor")
-          query.declareParameters("com.jcraft.lift.model.Author paramAuthor")
-          query.execute(a).asInstanceOf[java.util.List[Book]]
-        }
-        finally{query.closeAll}
+      Model.finallyClosePM{ 
+        from(_, classOf[Book])
+            .where(eqC("author", a))
+            .resultList 
       }
-      convertList[Book](l).toList
     }
 
     authors.flatMap(author =>
@@ -72,7 +62,7 @@ class AuthorOps {
         error("emptyAuthor", "The author's name cannot be blank")
       } 
       else {
-        Model{ case pm =>
+        Model.finallyClosePM{ pm =>
           pm.makePersistent(author)
         }
         redirectTo("list.html")

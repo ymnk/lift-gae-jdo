@@ -54,7 +54,7 @@ class Boot {
 
     LiftRules.early.append(makeUtf8)
 
-    LiftRules.setSiteMap(SiteMap(MenuInfo.menu :_*))
+    LiftRules.setSiteMap(SiteMap(Nil, MenuInfo.menu :_*))
 
   }
 
