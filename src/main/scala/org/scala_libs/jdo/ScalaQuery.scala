@@ -38,18 +38,20 @@ class ScalaQuery[A](val pm:PersistenceManager, val clss:Class[A]){
   private var rangeIndex:Option[(Long, Long)] = None
   private var _timeoutMillis:Option[Int] = None
 
-  def resultList() = finallyClose{ q =>
+  def resultList() = {
+    val q = newQuery
     convertList[A](q.executeWithArray(parameters:_*).asInstanceOf[JList[A]]).toList
   }
 
   def findOne():Option[A] = toOption(getSingleResult)
 
-  def getSingleResult():A = finallyClose{ query =>
+  def getSingleResult():A = {
+    val query = newQuery
     query.setUnique(true)
     query.executeWithArray(parameters:_*).asInstanceOf[A]
   }
 
-  def getFirstResult():Option[A] ={
+  def getFirstResult():Option[A] = {
     range(0, 1)
     resultList match{
       case l if l.size==0 => None
@@ -57,15 +59,7 @@ class ScalaQuery[A](val pm:PersistenceManager, val clss:Class[A]){
     }
   }
 
-  private def finallyClose[A](f: Query =>A):A = {
-    val query = newQuery
-    try{ f(query) }
-    finally{
-      query.closeAll
-    }
-  }
-
-  def newQuery={
+  def newQuery = {
     val query = pm.newQuery(clss)
     filter match{
       case "" =>
@@ -106,7 +100,7 @@ class ScalaQuery[A](val pm:PersistenceManager, val clss:Class[A]){
     this
   }
 
-  private def parameters() ={
+  private def parameters() = {
     filterCriteria.map(_.parameter).toArray
   } 
 
@@ -120,11 +114,11 @@ class ScalaQuery[A](val pm:PersistenceManager, val clss:Class[A]){
     orderCriteria.toList.map(_.queryString()).mkString(", ")
   }
 
-  def queryStringWithParameters()={
+  def queryStringWithParameters() = {
     queryString + " with " + Arrays.asList(parameters:_*)
   }
 
-  def queryString()={
+  def queryString() = {
     val sb = new StringBuilder
     sb.append("select from ").append(clss.getName)
     filter match{

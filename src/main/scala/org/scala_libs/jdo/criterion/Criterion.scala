@@ -19,49 +19,33 @@ trait Criterion{
   val property:String
 }
 
-trait FilterCriterion extends Criterion{
+abstract class FilterCriterion(val pattern:String) extends Criterion {
   val parameter:AnyRef
-  val pattern:String
   def queryString(parameterName:String):String =
     pattern.format(property, parameterName)
 }
 
-case class containsC(override val property:String, 
-                     override val parameter:AnyRef) extends FilterCriterion{
-  val pattern = "%s.contains(%s)"
-}
+case class containsC(override val property:String, override val parameter:AnyRef) 
+             extends FilterCriterion("%s.contains(%s)")
 
-case class eqC(override val property:String, 
-               override val parameter:AnyRef) extends FilterCriterion{
-  val pattern = "%s == %s"
-}
+case class eqC(override val property:String, override val parameter:AnyRef)
+             extends FilterCriterion("%s == %s")
 
-case class geC(override val property:String, 
-               override val parameter:AnyRef) extends FilterCriterion{
-  val pattern = "%s >= %s"
-}
-case class gtC(override val property:String, 
-               override val parameter:AnyRef) extends FilterCriterion{
-  val pattern = "%s > %s"
-}
-case class leC(override val property:String, 
-               override val parameter:AnyRef) extends FilterCriterion{
-  val pattern = "%s <= %s"
-}
+case class geC(override val property:String, override val parameter:AnyRef)
+             extends FilterCriterion("%s >= %s")
 
-case class ltC(override val property:String, 
-               override val parameter:AnyRef) extends FilterCriterion{
-  val pattern = "%s < %s"
-}
+case class gtC(override val property:String, override val parameter:AnyRef)
+             extends FilterCriterion("%s > %s")
 
-trait OrderCriterion extends Criterion{
-  val pattern:String
+case class leC(override val property:String, override val parameter:AnyRef)
+             extends FilterCriterion("%s <= %s")
+
+case class ltC(override val property:String, override val parameter:AnyRef)
+             extends FilterCriterion("%s < %s")
+
+abstract class OrderCriterion(val pattern:String) extends Criterion{
   def queryString():String = property + pattern
 }
 
-case class ascC(override val property:String) extends OrderCriterion{
-  val pattern = " asc"
-}
-case class descC(override val property:String) extends OrderCriterion{
-  val pattern = " desc"
-}
+case class ascC(override val property:String) extends OrderCriterion(" asc")
+case class descC(override val property:String) extends OrderCriterion(" desc")

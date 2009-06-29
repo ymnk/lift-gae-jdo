@@ -39,7 +39,7 @@ class BookOps {
   val formatter = new java.text.SimpleDateFormat("yyyyMMdd")
 
   def list (xhtml : NodeSeq) : NodeSeq = {
-    val books = Model.finallyClosePM{ from(_, classOf[Book]).resultList }
+    val books = Model.withPM{ from(_, classOf[Book]).resultList }
 
     books.flatMap(book =>
       bind("book", xhtml,
@@ -55,12 +55,13 @@ class BookOps {
   object bookVar extends RequestVar[Option[Key]](None)
   lazy val book = bookVar.is match {
     case Some(key) => {
-      Model.finallyClosePM{ pm =>
-        pm.getObjectById(classOf[Book], key).asInstanceOf[Book] match {
-          case book =>
+      Model.withPM{ pm =>
+        getObjectById[Book](pm, classOf[Book], key) match {
+          case Some(book) =>
             pm.detachCopy(book.author)
             book
-	}
+          case _ => null
+        }
       }
     }
     case _ => new Book()
@@ -89,10 +90,13 @@ class BookOps {
   def findAuthor(a:Author):Author = findAuthorById(a.id)
   def findAuthorById(id:String):Author = findAuthorById(stringToKey(id))
   def findAuthorById(id:Key):Author = {
-    Model.finallyClosePM{ pm =>
-      val a=pm.getObjectById(classOf[Author], id).asInstanceOf[Author]
-      pm.detachCopyAll(a.books)
-      a
+    Model.withPM{ pm =>
+      getObjectById[Author](pm, classOf[Author], id) match {
+        case Some(author) =>
+          pm.detachCopyAll(author.books)
+          author
+        case _ => null
+      }
     }
   }
 
@@ -101,7 +105,7 @@ class BookOps {
     def doAdd () = 
       if (is_valid_Book_?(book)) {
         try{
-          Model.finallyClosePM{ pm =>
+          Model.withPM{ pm =>
             book.id match {
               case null => 
                 book.author.books.add(book)
@@ -120,9 +124,7 @@ class BookOps {
 
     lazy val current = book
 
-    val authors = Model.finallyClosePM{ 
-      from(_, classOf[Author]).resultList 
-    }
+    val authors = Model.withPM{ from(_, classOf[Author]).resultList }
 
     val choices = authors.map(author => 
       (keyToString(author.id) -> author.name)).toList
@@ -161,7 +163,7 @@ class BookOps {
     var title = ""
 
     def doSearch () = {
-      val l = Model.finallyClosePM{
+      val l = Model.withPM{
         from(_, classOf[Book])
             .where(eqC("title", title))
             .resultList

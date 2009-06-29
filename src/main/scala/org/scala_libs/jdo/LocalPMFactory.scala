@@ -31,20 +31,20 @@ class LocalPMFactory(val unitName : String)
     pm.close()
   }
 
-  def finallyClosePM[A](f: PersistenceManager => A):A={
+  def withPM[A](f: PersistenceManager => A):A={
     val _pm = openPM
     try{ f(_pm) }
     finally{ closePM(_pm) }   
   }
 
-  def finallyClosePMinTX[A](f: PersistenceManager => A):A={
+  def inTX[A](f: PersistenceManager => A):A={
     val _pm = openPM
     val tx = _pm.currentTransaction
     try{ 
       tx.begin
-      val a = f(_pm) 
-      tx.commit
-      a
+      f(_pm) match {
+        case a => tx.commit; a
+      } 
     }
     finally{
       if(tx.isActive){

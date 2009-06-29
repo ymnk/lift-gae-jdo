@@ -30,12 +30,10 @@ import _root_.org.scala_libs.jdo.criterion._
 class AuthorOps {
 
   def list (xhtml : NodeSeq) : NodeSeq = {
-    val authors = Model.finallyClosePM{ pm => 
-      from(pm, classOf[Author]).resultList 
-    }
+    val authors = Model.withPM{ from(_, classOf[Author]).resultList }
 
     def findBooksByAuthor(a:Author) = {
-      Model.finallyClosePM{ 
+      Model.withPM{ 
         from(_, classOf[Book])
             .where(eqC("author", a))
             .resultList 
@@ -62,9 +60,7 @@ class AuthorOps {
         error("emptyAuthor", "The author's name cannot be blank")
       } 
       else {
-        Model.finallyClosePM{ pm =>
-          pm.makePersistent(author)
-        }
+        Model.withPM{ _.makePersistent(author) }
         redirectTo("list.html")
       }
     }
