@@ -56,10 +56,11 @@ class BookOps {
   lazy val book = bookVar.is match {
     case Some(key) => {
       Model.finallyClosePM{ pm =>
-        val foo=pm.getObjectById(classOf[Book], key).asInstanceOf[Book]
-        pm.detachCopy(foo.author)
-        val books = foo.author.books
-        books.get(books.indexOf(foo))
+        pm.getObjectById(classOf[Book], key).asInstanceOf[Book] match {
+          case book =>
+            pm.detachCopy(book.author)
+            book
+	}
       }
     }
     case _ => new Book()
@@ -102,10 +103,12 @@ class BookOps {
         try{
           Model.finallyClosePM{ pm =>
             book.id match {
-              case null => book.author.books.add(book)
+              case null => 
+                book.author.books.add(book)
+                pm.makePersistent(book.author)
               case _ => 
+                pm.makePersistent(book)
             }
-            pm.makePersistent(book.author)
           }
           redirectTo("list")
         } 
