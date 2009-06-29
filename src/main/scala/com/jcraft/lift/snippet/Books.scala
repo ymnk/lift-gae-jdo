@@ -49,7 +49,10 @@ class BookOps {
            "author" -> Text(book.author.name),
            "edit" -> SHtml.link("add.html", 
                                 () => bookVar(Some(book.id)), 
-                                Text(?("Edit")))))
+                                Text(?("Edit"))),
+           "delete" -> SHtml.link("list.html", 
+                                () => Model.withPM{ _.deletePersistent(book)},
+                                Text(?("Delete")))))
   }
 
   object bookVar extends RequestVar[Option[Key]](None)

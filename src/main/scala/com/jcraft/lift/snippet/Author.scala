@@ -48,7 +48,10 @@ class AuthorOps {
                                  Text(author.books.size.toString)),
            "edit" -> SHtml.link("add.html", 
                                 () => authorVar(author),
-                                Text(?("Edit")))))
+                                Text(?("Edit"))),
+           "delete" -> SHtml.link("list.html", 
+                                () => Model.withPM{ _.deletePersistent(author)},
+                                Text(?("Delete")))))
   }
 
   object authorVar extends RequestVar(new Author())
