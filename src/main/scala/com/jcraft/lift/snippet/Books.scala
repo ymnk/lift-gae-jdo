@@ -168,7 +168,8 @@ class BookOps {
     def doSearch () = {
       val l = Model.withPM{
         from(_, classOf[Book])
-            .where(eqC("title", title))
+            .where(geC("title", title),
+                   ltC("title", title+"~"))
             .resultList
       }
       BookOps.resultVar(l)
