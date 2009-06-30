@@ -169,7 +169,7 @@ class BookOps {
       val l = Model.withPM{
         from(_, classOf[Book])
             .where(geC("title", title),
-                   ltC("title", title+"~"))
+                   ltC("title", title+"\ufffd"))
             .resultList
       }
       BookOps.resultVar(l)
