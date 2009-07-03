@@ -48,27 +48,15 @@ class BookOps {
            "genre" -> Text(if(book.genre != null) book.genre.toString else ""),
            "author" -> Text(book.author.name),
            "edit" -> SHtml.link("add.html", 
-                                () => bookVar(Some(book.id)), 
+                                () => bookVar(book), 
                                 Text(?("Edit"))),
            "delete" -> SHtml.link("list.html", 
                                 () => Model.withPM{ _.deletePersistent(book)},
                                 Text(?("Delete")))))
   }
 
-  object bookVar extends RequestVar[Option[Key]](None)
-  lazy val book = bookVar.is match {
-    case Some(key) => {
-      Model.withPM{ pm =>
-        getObjectById[Book](pm, classOf[Book], key) match {
-          case Some(book) =>
-            pm.detachCopy(book.author)
-            book
-          case _ => null
-        }
-      }
-    }
-    case _ => new Book()
-  }
+  object bookVar extends RequestVar[Book](new Book)
+  lazy val book = bookVar.is
 
   def is_valid_Book_? (toCheck : Book) : Boolean ={
     List((if (toCheck.title.length == 0) { 
@@ -142,7 +130,7 @@ class BookOps {
 
     import SHtml.{hidden, text, select, submit}
     bind("book", xhtml,
-         "id" -> hidden(() => bookVar(Some(current.id))),
+         "id" -> hidden(() => bookVar(current)),
          "title" -> text(book.title, book.title=_),
          "published" -> text(formatter.format(book.published), 
                                    setDate(_, book)) % ("id" -> "published"),
