@@ -19,6 +19,7 @@ import _root_.net.liftweb._
 import util.{Helpers, Box, Full, Empty, Failure, Log, NamedPF, Props}
 import http._
 import sitemap._
+import provider._
 import Helpers._
 
 import com.jcraft.lift.model._
@@ -58,7 +59,9 @@ class Boot {
 
   }
 
-  private def makeUtf8(req: HttpServletRequest): Unit = {req.setCharacterEncoding("UTF-8")}
+  private def makeUtf8(req: HTTPRequest) = {
+    req.setCharacterEncoding("UTF-8")
+  }
 }
 
 object MenuInfo {
