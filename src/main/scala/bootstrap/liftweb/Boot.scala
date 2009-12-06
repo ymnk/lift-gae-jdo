@@ -16,11 +16,10 @@
 package bootstrap.liftweb
 
 import _root_.net.liftweb._
-import util.{Helpers, Box, Full, Empty, Failure, Log, NamedPF, Props}
+import _root_.net.liftweb.common._
 import http._
 import sitemap._
 import provider._
-import Helpers._
 
 import com.jcraft.lift.model._
 

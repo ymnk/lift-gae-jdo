@@ -30,13 +30,29 @@ import _root_.org.scala_libs.jdo.criterion._
 class AuthorOps {
 
   def list (xhtml : NodeSeq) : NodeSeq = {
-    val authors = Model.withPM{ from(_, classOf[Author]).resultList }
+    // TODO
+    /**
+     * After updating appengine-SDK, detachCopyAll is needed.
+     * I have not found a reason yet.
+     */ 
+    // val authors = Model.withPM{ from(_, classOf[Author]).resultList }
+    val authors = Model.withPM{ pm =>
+      from(pm, classOf[Author]).resultList.map{a => pm.detachCopyAll(a.books); a}
+    }
 
     def findBooksByAuthor(a:Author) = {
+/*
       Model.withPM{ 
         from(_, classOf[Book])
             .where(eqC("author", a))
             .resultList 
+      }
+*/
+      Model.withPM{ pm =>
+        from(pm, classOf[Book])
+            .where(eqC("author", a))
+            .resultList 
+            .map{b => pm.detachCopyAll(b.author); b}
       }
     }
 
@@ -46,6 +62,7 @@ class AuthorOps {
            "count" -> SHtml.link("/books/search", 
                                  () => BookOps.resultVar(findBooksByAuthor(author)),
                                  Text(author.books.size.toString)),
+
            "edit" -> SHtml.link("add.html", 
                                 () => authorVar(author),
                                 Text(?("Edit"))),

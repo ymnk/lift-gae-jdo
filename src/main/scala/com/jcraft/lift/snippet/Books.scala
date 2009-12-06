@@ -18,9 +18,11 @@ package com.jcraft.lift.snippet
 import _root_.java.text.{ParseException,SimpleDateFormat}
 import _root_.scala.xml.{NodeSeq,Text}
 import _root_.net.liftweb.http.{RequestVar,S,SHtml}
-import _root_.net.liftweb.util.{Box,Empty,Full,Helpers,Log}
-import S._
+import _root_.net.liftweb.common._
+import _root_.net.liftweb.util._
+import _root_.net.liftweb.util.Helpers
 import Helpers._
+import S._
 
 import _root_.com.jcraft.lift.model._
 import _root_.com.jcraft.lift.model.Model._
@@ -39,7 +41,10 @@ class BookOps {
   val formatter = new java.text.SimpleDateFormat("yyyyMMdd")
 
   def list (xhtml : NodeSeq) : NodeSeq = {
-    val books = Model.withPM{ from(_, classOf[Book]).resultList }
+    // val books = Model.withPM{ from(_, classOf[Book]).resultList }
+    val books = Model.withPM{ pm => 
+      from(pm, classOf[Book]).resultList.map{b => pm.detachCopyAll(b.author); b}
+    }
 
     books.flatMap(book =>
       bind("book", xhtml,
@@ -154,12 +159,22 @@ class BookOps {
     var title = ""
 
     def doSearch () = {
+/*
       val l = Model.withPM{
         from(_, classOf[Book])
             .where(geC("title", title),
                    ltC("title", title+"\ufffd"))
             .resultList
       }
+*/
+
+      val l = Model.withPM{ pm =>
+        from(pm, classOf[Book])
+            .where(geC("title", title),
+                   ltC("title", title+"\ufffd"))
+            .resultList.map{b => pm.detachCopyAll(b.author); b}
+      }
+
       BookOps.resultVar(l)
     }
 
