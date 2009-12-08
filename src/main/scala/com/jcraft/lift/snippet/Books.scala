@@ -41,10 +41,7 @@ class BookOps {
   val formatter = new java.text.SimpleDateFormat("yyyyMMdd")
 
   def list (xhtml : NodeSeq) : NodeSeq = {
-    // val books = Model.withPM{ from(_, classOf[Book]).resultList }
-    val books = Model.withPM{ pm => 
-      from(pm, classOf[Book]).resultList.map{b => pm.detachCopyAll(b.author); b}
-    }
+    val books = Model.withPM{ from(_, classOf[Book]).resultList }
 
     books.flatMap(book =>
       bind("book", xhtml,
@@ -159,20 +156,11 @@ class BookOps {
     var title = ""
 
     def doSearch () = {
-/*
       val l = Model.withPM{
         from(_, classOf[Book])
             .where(geC("title", title),
                    ltC("title", title+"\ufffd"))
             .resultList
-      }
-*/
-
-      val l = Model.withPM{ pm =>
-        from(pm, classOf[Book])
-            .where(geC("title", title),
-                   ltC("title", title+"\ufffd"))
-            .resultList.map{b => pm.detachCopyAll(b.author); b}
       }
 
       BookOps.resultVar(l)

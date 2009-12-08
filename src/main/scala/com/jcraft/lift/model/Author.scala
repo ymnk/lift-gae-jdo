@@ -31,6 +31,7 @@ class Author {
   @Persistent
   var name : String = ""
 
-  @Persistent{val mappedBy = "author"}
+  @Persistent{val mappedBy = "author",
+              val defaultFetchGroup="true"}
   var books : java.util.List[Book] = new java.util.LinkedList[Book]
 }

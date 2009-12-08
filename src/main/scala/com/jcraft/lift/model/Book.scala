@@ -38,6 +38,6 @@ class Book {
   @Persistent
   var genre : String = Genre.unknown.toString
 
-  @Persistent
+  @Persistent{ val defaultFetchGroup="true"}
   var author : Author = _
 }
