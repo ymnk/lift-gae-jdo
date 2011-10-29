@@ -49,10 +49,10 @@ class BookOps {
            "published" -> Text(formatter.format(book.published)),
            "genre" -> Text(if(book.genre != null) book.genre.toString else ""),
            "author" -> Text(book.author.name),
-           "edit" -> SHtml.link("add.html", 
-                                () => bookVar(book), 
+           "edit" -> SHtml.link("add.html",
+                                () => bookVar(book),
                                 Text(?("Edit"))),
-           "delete" -> SHtml.link("list.html", 
+           "delete" -> SHtml.link("list.html",
                                 () => Model.withPM{ _.deletePersistent(book)},
                                 Text(?("Delete")))))
   }
@@ -61,13 +61,13 @@ class BookOps {
   lazy val book = bookVar.is
 
   def is_valid_Book_? (toCheck : Book) : Boolean ={
-    List((if (toCheck.title.length == 0) { 
-            S.error("You must provide a title"); false 
+    List((if (toCheck.title.length == 0) {
+            S.error("You must provide a title"); false
            } else true),
-         (if (toCheck.published == null) { 
-            S.error("You must provide a publish date"); false 
+         (if (toCheck.published == null) {
+            S.error("You must provide a publish date"); false
           } else true),
-         (if (toCheck.genre == null) { 
+         (if (toCheck.genre == null) {
             S.error("You must select a genre"); false } else true),
          (if (toCheck.author == null) {
             S.error("You must select an author"); false
@@ -76,7 +76,7 @@ class BookOps {
   }
 
   def setDate (input : String, toSet : Book) {
-    try { toSet.published=formatter.parse(input) } 
+    try { toSet.published=formatter.parse(input) }
     catch { case pe : ParseException => S.error("Error parsing the date") }
   }
 
@@ -95,22 +95,22 @@ class BookOps {
 
   def add (xhtml : NodeSeq) : NodeSeq = {
 
-    def doAdd () = 
+    def doAdd () =
       if (is_valid_Book_?(book)) {
         try{
           Model.withPM{ pm =>
             book.id match {
-              case null => 
+              case null =>
                 book.author.books.add(book)
                 pm.makePersistent(book.author)
-              case _ => 
+              case _ =>
                 pm.makePersistent(book)
             }
           }
           redirectTo("list")
-        } 
+        }
         catch {
-	  case pe : JDOUserException => 
+	  case pe : JDOUserException =>
             error("Error adding book"); Log.error("Book add failed", pe)
         }
       }
@@ -119,10 +119,10 @@ class BookOps {
 
     val authors = Model.withPM{ from(_, classOf[Author]).resultList }
 
-    val choices = authors.map(author => 
+    val choices = authors.map(author =>
       (keyToString(author.id) -> author.name)).toList
-    val default = 
-       if (book.author != null) { Full(keyToString(book.author.id)) } 
+    val default =
+       if (book.author != null) { Full(keyToString(book.author.id)) }
        else { Empty }
 
     def find(n:String):Author = {
@@ -134,22 +134,22 @@ class BookOps {
     bind("book", xhtml,
          "id" -> hidden(() => bookVar(current)),
          "title" -> text(book.title, book.title=_),
-         "published" -> text(formatter.format(book.published), 
+         "published" -> text(formatter.format(book.published),
                                    setDate(_, book)) % ("id" -> "published"),
-         "genre" -> select(Genre.getNameDescriptionList, 
-                           (Box.legacyNullTest(book.genre).map(_.toString) or Full("")), 
+         "genre" -> select(Genre.getNameDescriptionList,
+                           (Box.legacyNullTest(book.genre).map(_.toString) or Full("")),
                            choice => book.genre = Genre.valueOf(choice).getOrElse("").toString),
-         "author" -> select(choices, 
-                            default, 
+         "author" -> select(choices,
+                            default,
                             (id) => if(book.author==null)
                                       book.author=findAuthorById(id)),
          "save" -> submit(?("Save"), doAdd))
   }
 
-  def searchResults (xhtml : NodeSeq) : NodeSeq = 
+  def searchResults (xhtml : NodeSeq) : NodeSeq =
     BookOps.resultVar.is.flatMap(result =>
-      bind("result", xhtml, 
-           "title" -> Text(result.title), 
+      bind("result", xhtml,
+           "title" -> Text(result.title),
            "author" -> Text(result.author.name)))
 
   def search (xhtml : NodeSeq) : NodeSeq = {

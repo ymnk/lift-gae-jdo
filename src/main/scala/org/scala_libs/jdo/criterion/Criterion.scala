@@ -25,7 +25,7 @@ abstract class FilterCriterion(val pattern:String) extends Criterion {
     pattern.format(property, parameterName)
 }
 
-case class containsC(override val property:String, override val parameter:AnyRef) 
+case class containsC(override val property:String, override val parameter:AnyRef)
              extends FilterCriterion("%s.contains(%s)")
 
 case class eqC(override val property:String, override val parameter:AnyRef)

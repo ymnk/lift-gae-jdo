@@ -102,7 +102,7 @@ class ScalaQuery[A](val pm:PersistenceManager, val clss:Class[A]){
 
   private def parameters() = {
     filterCriteria.map(_.parameter).toArray
-  } 
+  }
 
   private def filter() = {
     filterCriteria.toList.zipWithIndex.map{
@@ -123,7 +123,7 @@ class ScalaQuery[A](val pm:PersistenceManager, val clss:Class[A]){
     sb.append("select from ").append(clss.getName)
     filter match{
       case "" =>
-      case f => sb.append(" where ").append(f)	
+      case f => sb.append(" where ").append(f)
     }
     ordering match{
       case "" =>
@@ -137,6 +137,6 @@ class ScalaQuery[A](val pm:PersistenceManager, val clss:Class[A]){
     sb.toString
   }
 }
- 
- 
- 
+
+
+
