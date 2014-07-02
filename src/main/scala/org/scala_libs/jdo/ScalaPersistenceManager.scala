@@ -21,10 +21,10 @@ trait ScalaPersistenceManager {
 
   protected def pm : PersistenceManager
 
-  val factory : ScalaPMFactory 
+  val factory : ScalaPMFactory
 
   def from[A](pm:PersistenceManager, c:Class[A]) = new ScalaQuery[A](pm, c)
-  def getObjectById[A](pm:PersistenceManager, c:Class[A], key:Object):Option[A] = 
+  def getObjectById[A](pm:PersistenceManager, c:Class[A], key:Object):Option[A] =
     pm.getObjectById(c, key).asInstanceOf[A] match{
       case null => None
       case a => Some(a)

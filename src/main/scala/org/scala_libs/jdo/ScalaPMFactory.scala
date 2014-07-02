@@ -20,9 +20,9 @@ import javax.jdo.PersistenceManager
 trait ScalaPMFactory {
 
   protected def openPM () : PersistenceManager
- 
+
   protected[jdo] def closePM (pm : PersistenceManager) : Unit
- 
+
   def newPM : ScalaPersistenceManager = {
     val underlying = openPM()
     val owner = this

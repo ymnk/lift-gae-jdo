@@ -66,7 +66,7 @@ class Boot {
 object MenuInfo {
   import Loc._
 
-  def menu: List[Menu] =  
+  def menu: List[Menu] =
        Menu(Loc("Home", "index" :: Nil, "Home")) ::
        Menu(Loc("Authors", List("authors", "list"), "Author List")) ::
        Menu(Loc("Add Authors", List("authors", "add"), "Add Author", Hidden)) ::

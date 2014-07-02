@@ -33,24 +33,24 @@ class AuthorOps {
     val authors = Model.withPM{ from(_, classOf[Author]).resultList }
 
     def findBooksByAuthor(a:Author) = {
-      Model.withPM{ 
+      Model.withPM{
         from(_, classOf[Book])
             .where(eqC("author", a))
-            .resultList 
+            .resultList
       }
     }
 
     authors.flatMap(author =>
       bind("author", xhtml,
            "name" -> Text(author.name),
-           "count" -> SHtml.link("/books/search", 
+           "count" -> SHtml.link("/books/search",
                                  () => BookOps.resultVar(findBooksByAuthor(author)),
                                  Text(author.books.size.toString)),
 
-           "edit" -> SHtml.link("add.html", 
+           "edit" -> SHtml.link("add.html",
                                 () => authorVar(author),
                                 Text(?("Edit"))),
-           "delete" -> SHtml.link("list.html", 
+           "delete" -> SHtml.link("list.html",
                                 () => Model.withPM{ _.deletePersistent(author)},
                                 Text(?("Delete")))))
   }
@@ -62,7 +62,7 @@ class AuthorOps {
     def doAdd () = {
       if (author.name.length == 0) {
         error("emptyAuthor", "The author's name cannot be blank")
-      } 
+      }
       else {
         Model.withPM{ _.makePersistent(author) }
         redirectTo("list.html")

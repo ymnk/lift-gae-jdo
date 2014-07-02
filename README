@@ -2,7 +2,7 @@ What is This?
 ==============
 This Liftweb application will demonstrate how to manage
 owned One-to-Many relation on Google App Engine for Java
-through the JDO2 interface.  The code has been based on 
+through the JDO2 interface.  The code has been based on
 Derek Chen-Becker's JPADemo[1][2].
 
 
@@ -14,7 +14,7 @@ Before the compilation, a few steps are needed to be done.
      '/tmp/appengine-java-sdk-1.2.8' directory.
   2. Replace '????' for 'sdk.dir' property in build.xml with your own.
      In this example, it should be '/tmp/appengine-java-sdk-1.2.8'.
-  3. Set your application name on GAE/J to 
+  3. Set your application name on GAE/J to
        'src/main/webapp/WEB-INF/appengine-web.xml' file.
 
 Now, you are ready to run or upload this liftweb application to GAE/J.
@@ -45,7 +45,7 @@ TODO
     skip steps to download datanucleus-enhancer.jar file.
   * org.scala_libs.jdo package should be independently released and
     provided as scalajdo.
- 
+
 
 Enjoy!
 

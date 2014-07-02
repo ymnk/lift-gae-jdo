@@ -35,10 +35,10 @@ object Genre extends Enumeration{
   val unknown = Value("Unknown", "Unknown genre")
 
   def getDescriptionOrName(ev: this.Value) = {
-    try { nameDescriptionMap(""+ev) } 
+    try { nameDescriptionMap(""+ev) }
     catch {  case e: NoSuchElementException => ev.toString }
   }
 
-  def getNameDescriptionList =  
+  def getNameDescriptionList =
     elements.toList.map(v => (v.toString, getDescriptionOrName(v))).toList
 }
